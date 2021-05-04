@@ -1,7 +1,6 @@
 defmodule Bpv7 do
   @moduledoc """
   Documentation for `Bpv7`.
-  test
   """
 
   @doc """
