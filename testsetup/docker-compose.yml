@@ -1,0 +1,24 @@
+services:
+  ud3tn-node:
+    image: registry.gitlab.com/d3tn/ud3tn-docker-images/ud3tn
+    command: --eid dtn://ud3tn-node.dtn --bp-version 7 --aap-port 4242 --cla "mtcp:*,4224"
+
+    ports:
+      - "127.0.0.1:4242:4242"
+      - "127.0.0.1:4224:4224"
+    networks:
+      - bpv7
+    
+
+  node2:
+    image: registry.gitlab.com/d3tn/ud3tn-docker-images/ud3tn
+    command: --eid dtn://node2.dtn --bp-version 7 --aap-port 4243 --cla "mtcp:*,4225"
+
+    ports:
+      - "127.0.0.1:4243:4243"
+      - "127.0.0.1:4225:4225"
+    networks:
+      - bpv7
+
+networks:
+  bpv7:
