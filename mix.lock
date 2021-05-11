@@ -1,0 +1,4 @@
+%{
+  "cbor": {:git, "https://github.com/galdor/erl-cbor.git", "4df2b35cc2531ead4cf5969ea8bd17327efb7e27", []},
+  "erl_cbor": {:git, "https://github.com/galdor/erl-cbor.git", "4df2b35cc2531ead4cf5969ea8bd17327efb7e27", []},
+}
