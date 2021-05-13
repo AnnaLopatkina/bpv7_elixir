@@ -19,5 +19,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="erl_cbor" level="project" />
     <orderEntry type="library" name="cbor" level="project" />
+    <orderEntry type="library" name="ex_doc" level="project" />
   </component>
 </module>
