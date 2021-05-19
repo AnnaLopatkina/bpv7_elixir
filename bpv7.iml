@@ -15,10 +15,18 @@
       <excludeFolder url="file://$MODULE_DIR$/logs" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/erl_cbor" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/cbor" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/typed_struct" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="erl_cbor" level="project" />
     <orderEntry type="library" name="cbor" level="project" />
     <orderEntry type="library" name="ex_doc" level="project" />
+    <orderEntry type="library" name="typed_struct" level="project" />
+    <orderEntry type="library" name="ex_check" level="project" />
+    <orderEntry type="library" name="credo" level="project" />
+    <orderEntry type="library" name="dialyxir" level="project" />
+    <orderEntry type="library" name="excoveralls" level="project" />
+    <orderEntry type="library" name="mix_test_watch" level="project" />
+    <orderEntry type="library" name="ex_unit_notifier" level="project" />
   </component>
 </module>

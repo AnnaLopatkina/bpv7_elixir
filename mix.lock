@@ -1,4 +1,5 @@
 %{
   "cbor": {:hex, :cbor, "1.0.0", "35d33a26f6420ce3d2d01c0b1463a748b34c537d5609fc40116daf3666700d36", [:mix], [], "hexpm", "cc5e21e0fa5a0330715a3806c67bc294f8b65d07160f751b5bd6058bed1962ac"},
   "erl_cbor": {:git, "https://github.com/galdor/erl-cbor.git", "4df2b35cc2531ead4cf5969ea8bd17327efb7e27", []},
+  "typed_struct": {:hex, :typed_struct, "0.2.1", "e1993414c371f09ff25231393b6430bd89d780e2a499ae3b2d2b00852f593d97", [:mix], [], "hexpm", "8f5218c35ec38262f627b2c522542f1eae41f625f92649c0af701a6fab2e11b3"},
 }
