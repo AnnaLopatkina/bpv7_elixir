@@ -6,7 +6,7 @@ defmodule Primary_Block do
   typedstruct do
     field :version, non_neg_integer()
     field :bundle_control_flags, Bundle_Control_Flags.t()
-    field :crc_type, CRC_Type.t()
+    field :crc_type, non_neg_integer()
     field :destination, EndpointID.t()
     field :source_node, EndpointID.t()
     field :report_to, EndpointID.t()

@@ -6,7 +6,7 @@ defmodule Canonical_Block do
   typedstruct do
     field :block_number, integer()
     field :block_control_flags, Block_Control_Flags.t()
-    field :crc_type, CRC_Type.t()
+    field :crc_type, non_neg_integer()
     field :crc, list(byte())
     field :value, Extension_Block.t()
   end
