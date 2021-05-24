@@ -28,12 +28,13 @@ defmodule Bpv7 do
     bpv7_epoch_milliseconds = DateTime.to_unix(Timex.to_datetime(bpv7_epoch_date), :milliseconds)
     now_milliseconds = DateTime.to_unix(Timex.now(), :milliseconds)
     creationtimestamp = %Creation_Time_Stamp{milliseconds: now_milliseconds-bpv7_epoch_milliseconds, sequence: 1}
+    IO.puts "BPv7 Epoch: #{bpv7_epoch_milliseconds} Milliseconds now: #{now_milliseconds}"
+    IO.puts "Result: #{now_milliseconds - bpv7_epoch_milliseconds}"
 
     primaryblock = %Primary_Block{version: 7, bundle_control_flags: bundle_control_flags, crc_type: 1, \
     destination: endpointid, source_node: endpointidsource, report_to: endpointid, creation_time_stamp: creationtimestamp, \
     lifetime: 360000, crc: [0000,0000,0000,0000]}
     primaryblock
-    now_milliseconds
 
   end
 end
