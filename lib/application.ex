@@ -2,9 +2,8 @@ defmodule Application do
   @moduledoc false
 
   def start(_type, _args) do
-    port = String.to_integer(System.get_env("PORT") || "4040")
     children = [
-      {Task, fn -> Server.accept(port) end}
+      {Task, fn -> Server.accept(4040) end}
     ]
 
     opts = [strategy: :one_for_one, name: Server.Supervisor]
