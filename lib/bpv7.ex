@@ -38,8 +38,7 @@ defmodule Bpv7 do
     primaryblock
   end
 
-  def crcprimaryblock(testprimaryblock()) do
-    #IO.puts "Primarybock to binary: #{:erlang.term_to_binary(primaryblock)}"
+  def crcprimaryblock(primaryblock) do
     CRC.crc_16(:erlang.term_to_binary(primaryblock))
   end
 end
