@@ -31,7 +31,6 @@ defmodule Server do
 
   defp read_line(socket) do
     {:ok, data} = :gen_tcp.recv(socket, 0)
-    IO.puts "Received: #{data}"
     data
   end
 
