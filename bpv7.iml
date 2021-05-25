@@ -68,5 +68,15 @@
     <orderEntry type="library" name="benchee_html" level="project" />
     <orderEntry type="library" name="jason" level="project" />
     <orderEntry type="library" name="crc32cer" level="project" />
+    <orderEntry type="library" name="ex_doc" level="project" />
+    <orderEntry type="library" name="ex_check" level="project" />
+    <orderEntry type="library" name="credo" level="project" />
+    <orderEntry type="library" name="dialyxir" level="project" />
+    <orderEntry type="library" name="excoveralls" level="project" />
+    <orderEntry type="library" name="mix_test_watch" level="project" />
+    <orderEntry type="library" name="ex_unit_notifier" level="project" />
+    <orderEntry type="library" name="benchfella" level="project" />
+    <orderEntry type="library" name="stream_data" level="project" />
+    <orderEntry type="library" name="propcheck" level="project" />
   </component>
 </module>
