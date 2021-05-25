@@ -17,7 +17,7 @@ defmodule Bpv7 do
     :world
   end
 
-  def testbundle do
+  def testprimaryblock do
     # Test primary block
     bundle_control_flags = %Bundle_Control_Flags{bundle_must_not_be_fragmented: true}
     endpointid = %EndpointID{scheme_name: "dtn", scheme_number: 1, authority: "u3dtn-node", path: "node1", is_singleton: true}
@@ -36,7 +36,9 @@ defmodule Bpv7 do
     lifetime: 360000, crc: [0000,0000,0000,0000]}
     primaryblock
   end
-
+  def crcprimaryblock(testprimaryblock()) do
+    #IO.puts "Primarybock to binary: #{:erlang.term_to_binary(primaryblock)}"
+    CRC.crc_16(:erlang.term_to_binary(primaryblock))
   def canonical_testblock do
 
     # Test canonical block
