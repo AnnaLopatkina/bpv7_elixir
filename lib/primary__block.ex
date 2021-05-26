@@ -13,9 +13,8 @@ defmodule Primary_Block do
     field :creation_time_stamp, Creation_Time_Stamp.t()
     field :lifetime, non_neg_integer()
     field :fragment_offset, integer()
-    field :total_data_legth, integer()
+    field :total_data_length, integer()
     field :crc, list(byte())
   end
-
 
 end
