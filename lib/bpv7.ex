@@ -39,9 +39,8 @@ defmodule Bpv7 do
   def crcprimaryblock(testprimaryblock()) do
     #IO.puts "Primarybock to binary: #{:erlang.term_to_binary(primaryblock)}"
     CRC.crc_16(:erlang.term_to_binary(primaryblock))
-  def canonical_testblock do
-
-    # Test canonical block
+  end
+  def canonical_testblock do    # Test canonical block
     block_control_flags_eins = %Block_Control_Flags{replicate_block: true, status_report_transmission: true, delete_bundle: true, delete_block: true}
     block_control_flags_zwei = %Block_Control_Flags{replicate_block: true, status_report_transmission: true, delete_bundle: true, delete_block: true}
     endpointID = %EndpointID{scheme_name: "dtn", scheme_number: 1, authority: "u3dtn-node", path: "node1", is_singleton: true}
@@ -55,6 +54,10 @@ defmodule Bpv7 do
 
     [canonicalblockEins, canonicalblockZwei]
 
+  end
+
+  def crcprimaryblock(primaryblock) do
+    CRC.crc_16(:erlang.term_to_binary(primaryblock))
   end
 end
 
