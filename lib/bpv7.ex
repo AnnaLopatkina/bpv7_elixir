@@ -57,7 +57,7 @@ defmodule Bpv7 do
   end
 
   def crccanonicalblocks(canonicalblocklist) do
-    crclist = Enum.map(canonicalblocklist, fn(n) -> CRC.crc_16(:erlang.term_to_binary(n)) end)
+    _crclist = Enum.map(canonicalblocklist, fn(n) -> CRC.crc_16(:erlang.term_to_binary(n)) end)
   end
 end
 
