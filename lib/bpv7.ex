@@ -36,10 +36,7 @@ defmodule Bpv7 do
     lifetime: 360000, crc: [0000,0000,0000,0000]}
     primaryblock
   end
-  def crcprimaryblock(testprimaryblock()) do
-    #IO.puts "Primarybock to binary: #{:erlang.term_to_binary(primaryblock)}"
-    CRC.crc_16(:erlang.term_to_binary(primaryblock))
-  end
+
   def canonical_testblock do    # Test canonical block
     block_control_flags_eins = %Block_Control_Flags{replicate_block: true, status_report_transmission: true, delete_bundle: true, delete_block: true}
     block_control_flags_zwei = %Block_Control_Flags{replicate_block: true, status_report_transmission: true, delete_bundle: true, delete_block: true}
@@ -53,7 +50,6 @@ defmodule Bpv7 do
       block_type_specific_data: :erlang.term_to_binary(endpointID) }
 
     [canonicalblockEins, canonicalblockZwei]
-
   end
 
   def crcprimaryblock(primaryblock) do
