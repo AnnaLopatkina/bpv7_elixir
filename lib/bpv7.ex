@@ -42,10 +42,10 @@ defmodule Bpv7 do
     block_control_flags_zwei = %Block_Control_Flags{replicate_block: true, status_report_transmission: true, delete_bundle: true, delete_block: true}
     endpointID = %EndpointID{scheme_name: "dtn", scheme_number: 1, authority: "u3dtn-node", path: "node1", is_singleton: true}
 
-    canonicalblockEins = %Cononical_Block{block_number: 1 , block_type_code: 1,\
+    canonicalblockEins = %Canonical_Block{block_number: 1 , block_type_code: 1,\
       block_control_flags: block_control_flags_eins, crc_type: 1 , crc: [0000,0000,0000,0000],\
       block_type_specific_data: :erlang.term_to_binary("hallo") }
-    canonicalblockZwei = %Cononical_Block{block_number: 2 , block_type_code: 6,\
+    canonicalblockZwei = %Canonical_Block{block_number: 2 , block_type_code: 6,\
       block_control_flags: block_control_flags_zwei, crc_type: 1 , crc: [0000,0000,0000,0000], \
       block_type_specific_data: :erlang.term_to_binary(endpointID) }
 
