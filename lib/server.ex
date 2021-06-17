@@ -1,4 +1,4 @@
-defmodule Server do
+defmodule Bpv7.Server do
   require Logger
 
   def accept(port) do
@@ -10,14 +10,16 @@ defmodule Server do
     # 4. `reuseaddr: true` - allows us to reuse the address if the listener crashes
     #
     {:ok, socket} =
-      :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
+      :gen_tcp.listen(port, [:binary, packet: :raw, active: false, reuseaddr: true])
     Logger.info("Accepting connections on port #{port}")
     loop_acceptor(socket)
   end
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    serve(client)
+    {:ok, pid} = Task.Supervisor.start_child(Bpv7.Server.TaskSupervisor, fn -> serve(client) end)
+    :ok = :gen_tcp.controlling_process(client, pid)
+    IO.puts "Connected"
     loop_acceptor(socket)
   end
 
@@ -31,7 +33,9 @@ defmodule Server do
 
   defp read_line(socket) do
     {:ok, data} = :gen_tcp.recv(socket, 0)
-    IO.puts "Received: #{data}"
+    hex_data = Base.encode16(data)
+    #{:ok, plain_data, ""} = CBOR.decode(data)
+    IO.puts "Received: #{hex_data}"
     data
   end
 
