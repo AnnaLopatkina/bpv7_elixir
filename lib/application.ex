@@ -11,5 +11,7 @@ defmodule Bpv7.Application do
 
     opts = [strategy: :one_for_one, name: Bpv7.Server.Supervisor]
     Supervisor.start_link(children, opts)
+
+    Bpv7.ConnManager.start([])
   end
 end
