@@ -14,12 +14,15 @@ defmodule Bpv7.ConnManager do
     socket = Agent.get(__MODULE__, &Map.get(&1, {host, port}))
     case socket do
       nil -> :not_found
-      _ -> :ok
+      _ -> case :gen_tcp.send(socket, "") do
+           {:error,:closed} -> :closed
+
+           end
     end
   end
 
   def connect(host, port) do
-    {:ok, socket} = :gen_tcp.connect(host, port, [])
+    {:ok, socket} = :gen_tcp.connect(host, port, [{:inet_backend, socket}])
     Agent.update(__MODULE__, &Map.put(&1, {host, port}, socket))
    end
 
