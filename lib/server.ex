@@ -25,21 +25,31 @@ defmodule Bpv7.Server do
 
   defp serve(socket) do
     socket
-    |> read_line()
+    |> read_line(nil)
     |> write_line(socket)
 
     serve(socket)
   end
 
-  defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    hex_data = Base.encode16(data)
-    #{:ok, plain_data, ""} = CBOR.decode(data)
-    IO.puts "Received: #{hex_data}"
+  defp read_line(socket, parent) do
+    {:ok, chunk} = :gen_tcp.recv(socket, 0)
+    data =
+      case parent do
+        nil -> chunk
+        _ -> parent <> chunk
+      end
+    data = try do
+      {:ok, plain_data, ""} = CBOR.decode(data)
+      plain_data
+    rescue
+      MatchError -> read_line(socket, data)
+    end
     data
   end
 
   defp write_line(line, socket) do
-    :gen_tcp.send(socket, line)
+    #:gen_tcp.send(socket, line)
+    hex_data = Base.encode16(line)
+    IO.puts(hex_data)
   end
 end
