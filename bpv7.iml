@@ -7,30 +7,30 @@
       <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/cbor" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/certifi" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/combine" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/crc" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/elixir_make" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/erl_cbor" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ex_crc" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/gettext" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/hackney" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/idna" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/metrics" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mimerl" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/timex" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/typed_struct" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/tzdata" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/unicode_util_compat" />
       <excludeFolder url="file://$MODULE_DIR$/assets/node_modules/phoenix" />
       <excludeFolder url="file://$MODULE_DIR$/assets/node_modules/phoenix_html" />
       <excludeFolder url="file://$MODULE_DIR$/cover" />
       <excludeFolder url="file://$MODULE_DIR$/deps" />
       <excludeFolder url="file://$MODULE_DIR$/doc" />
       <excludeFolder url="file://$MODULE_DIR$/logs" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/erl_cbor" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/cbor" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/typed_struct" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/parse_trans" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/unicode_util_compat" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/gettext" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mimerl" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/metrics" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ssl_verify_fun" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/idna" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/elixir_make" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/combine" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/crc" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ex_crc" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/hackney" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/tzdata" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/certifi" />
-      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/timex" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="erl_cbor" level="project" />
@@ -54,5 +54,19 @@
     <orderEntry type="library" name="propcheck" level="project" />
     <orderEntry type="library" name="hackney" level="project" />
     <orderEntry type="library" name="ex_crc" level="project" />
+    <orderEntry type="library" name="crc32c" level="project" />
+    <orderEntry type="library" name="idna" level="project" />
+    <orderEntry type="library" name="mimerl" level="project" />
+    <orderEntry type="library" name="certifi" level="project" />
+    <orderEntry type="library" name="metrics" level="project" />
+    <orderEntry type="library" name="parse_trans" level="project" />
+    <orderEntry type="library" name="ssl_verify_fun" level="project" />
+    <orderEntry type="library" name="unicode_util_compat" level="project" />
+    <orderEntry type="library" name="rustler" level="project" />
+    <orderEntry type="library" name="toml" level="project" />
+    <orderEntry type="library" name="benchee" level="project" />
+    <orderEntry type="library" name="benchee_html" level="project" />
+    <orderEntry type="library" name="jason" level="project" />
+    <orderEntry type="library" name="crc32cer" level="project" />
   </component>
 </module>
