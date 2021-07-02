@@ -13,10 +13,4 @@ defmodule Bundle_Control_Flags do
     field :bundle_delivery_reports, boolean(), default: false
     field :bundle_deletion_reports, boolean(), default: false
   end
-
-  def parse_intflag(intflag) do
-
-  end
-
-
 end
