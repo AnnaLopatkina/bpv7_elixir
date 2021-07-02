@@ -2,31 +2,14 @@ defmodule Bundle_Manager do
   use Timex
   use Bitwise
   @moduledoc false
-"""
-
-  def check_connection() do
-    if untereschranke <= Timex.now <= obereschranke do
-      forward_bundle_cla()
-      else
-      Schedule_Forwarding.Periodically.schedule_work(untereschranke - Timex.now())
-    end
   end
 
-  def forward_bundle_cla() do
-    #send modified bundle to cla
-  end
+  #Comands:
+  #bundle = Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009db3c6e53f121a000493e044f42e713e860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
+  #primary = Bundle_Manager.get_primary(bundle)
+  #primaryarray = Bundle_Manager.primary_to_array(primary)
+  #binary = Bundle_Manager.primaryarray_binary(primaryarray)
 
-  def serialize_bundle do
-
-  end
-
-  Comands:
-  bundle = Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009df6c9e5d1011a000493e044ca8897ea860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
-  primary = Bundle_Manager.get_primary(bundle)
-  primaryarray = Bundle_Manager.primary_to_array(primary)
-  binary = Bundle_Manager.primaryarray_binary(primaryarray)
-  
-"""
 
   def get_primary(blockarray) do
     {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, 0), 8), :value)
@@ -41,6 +24,20 @@ defmodule Bundle_Manager do
     primaryblock
   end
 
+  def get_canonical(blockarray, canonicalblocknumber) do
+    {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 5), :value)
+    {:ok, specific_data_needed_bitstring_encoded} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 4), :value)
+    {:ok, specific_data_decoded, ""} = CBOR.decode(specific_data_needed_bitstring_encoded)
+    canonicalblock = %Canonical_Block{block_type_code: Enum.at(Enum.at(blockarray, 0), 0),
+      block_number: Enum.at(Enum.at(blockarray, 0), 1),
+      block_control_flags: Enum.at(Enum.at(blockarray, 0), 2),
+      crc_type: Enum.at(Enum.at(blockarray,0 ), 3),
+      block_type_specific_data: specific_data_decoded,
+      crc: Base.encode16(crc_needed_bitstring)}
+
+    canonicalblock
+  end
+
   def decode_cbor_bundle(hexstring) do
     {:ok, array, ""} = CBOR.decode(Base.decode16!(String.upcase(hexstring)))
 
@@ -52,6 +49,13 @@ defmodule Bundle_Manager do
     primaryblock.source_node, primaryblock.report_to, primaryblock.creation_time_stamp, primaryblock.lifetime]
 
     primaryarray
+  end
+
+  def canonical_to_array(canonicalblock) do
+    canonicalarray = [canonicalblock.block_type_code, canonicalblock.block_number, canonicalblock.block_control_flags,
+      canonicalblock.crc_type, canonicalblock.block_type_specific_data, canonicalblock.crc]
+
+    canonicalarray
   end
 
   def primaryarray_binary (primaryarray) do
@@ -71,13 +75,8 @@ defmodule Bundle_Manager do
   end
 
   def check_crc_primary(primaryblock) do
-    checksum = primaryblock.crc
-
     primaryarray = primary_to_array(primaryblock)
     primarybinary = primaryarray_binary(primaryarray)
-
-    IO.puts "CRC berechnet: #{Integer.to_string(:crc32cer.nif(primarybinary), 16)}"
-    IO.puts "CRC erhalten: #{primaryblock.crc}"
 
     if primaryblock.crc == Integer.to_string(:crc32cer.nif(primarybinary), 16) do
 
@@ -91,4 +90,35 @@ defmodule Bundle_Manager do
 
   end
 
+  #def create_previous_Node_Block() do
+    #previousNodeBlock = %Canonical_Block{block_type_code: 10, block_number: ,
+      #block_control_flags: , crc_type: , block_type_specific_data:  , crc:}
+
+    #previousNodeBlock
+  #end
+
+  def change_Hop_Count_Block(bundlearray) do
+
+    hopCountBlock = get_canonical(bundlearray, 1)
+    hopCountBlockArray = canonical_to_array(hopCountBlock)
+
+    hopLimit = Enum.at(Enum.at(hopCountBlockArray, 4), 0)
+    hopCount = Enum.at(Enum.at(hopCountBlockArray, 4), 1)
+
+
+    if hopCount < hopLimit do
+
+      hopCountAndLimit = [hopLimit, hopCount + 1]
+      updatedHopCountBlockArray = List.replace_at(hopCountBlockArray, 4, hopCountAndLimit)
+
+      updatedHopCountBlockArray
+
+    else
+    :false
+    end
+  end
+
+  def change_Bundle_Age_Block() do
+
+  end
 end
