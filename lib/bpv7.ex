@@ -31,7 +31,7 @@ defmodule Bpv7 do
     IO.puts "BPv7 Epoch: #{bpv7_epoch_milliseconds} Milliseconds now: #{now_milliseconds}"
     IO.puts "Result: #{now_milliseconds - bpv7_epoch_milliseconds}"
 
-    primaryblock = %Primary_Block{version: 7, bundle_control_flags: bundle_control_flags, crc_type: 1, \
+    primaryblock = %Primary_Block{version: 7, bundle_control_flags: 0, crc_type: 1, \
     destination: endpointid, source_node: endpointidsource, report_to: endpointid, creation_time_stamp: creationtimestamp, \
     lifetime: 360000, crc: [0000,0000,0000,0000]}
     primaryblock
@@ -50,6 +50,10 @@ defmodule Bpv7 do
       block_type_specific_data: :erlang.term_to_binary(endpointID) }
 
     [canonicalblockEins, canonicalblockZwei]
+  end
+
+  def include_crc_primary(primaryblock) do
+    primaryblock.crc
   end
 
   def crcprimaryblock(primaryblock) do
