@@ -2,7 +2,6 @@ defmodule Bundle_Manager do
   use Timex
   use Bitwise
   @moduledoc false
-  end
 
   #Comands:
   #bundle = Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009db3c6e53f121a000493e044f42e713e860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
@@ -118,7 +117,4 @@ defmodule Bundle_Manager do
     end
   end
 
-  def change_Bundle_Age_Block() do
-
-  end
 end
