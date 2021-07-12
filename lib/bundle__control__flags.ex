@@ -1,4 +1,4 @@
-defmodule Bundle_Control_Flags do
+defmodule Bpv7.Bundle_Control_Flags do
   @moduledoc false
   use TypedStruct
 

@@ -1,4 +1,4 @@
-defmodule Bundle do
+defmodule Bpv7.Bundle do
   @moduledoc false
   use TypedStruct
 

@@ -1,4 +1,4 @@
-defmodule Primary_Block do
+defmodule Bpv7.Primary_Block do
   @moduledoc false
   # @type t() :: %__MODULE__{}
   use TypedStruct

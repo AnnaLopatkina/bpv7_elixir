@@ -1,4 +1,4 @@
-defmodule Bundle_Manager do
+defmodule Bpv7.Bundle_Manager do
   use Timex
   use Bitwise
   @moduledoc false
@@ -12,7 +12,7 @@ defmodule Bundle_Manager do
 
   def get_primary(blockarray) do
     {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, 0), 8), :value)
-    primaryblock = %Primary_Block{version: Enum.at(Enum.at(blockarray, 0), 0), bundle_control_flags: Enum.at(Enum.at(blockarray, 0), 1), crc_type: Enum.at(Enum.at(blockarray, 0), 2),
+    primaryblock = %Bpv7.Primary_Block{version: Enum.at(Enum.at(blockarray, 0), 0), bundle_control_flags: Enum.at(Enum.at(blockarray, 0), 1), crc_type: Enum.at(Enum.at(blockarray, 0), 2),
       destination: [Enum.at(Enum.at(Enum.at(blockarray, 0), 3), 0), Enum.at(Enum.at(Enum.at(blockarray, 0), 3), 1)],
       source_node: [Enum.at(Enum.at(Enum.at(blockarray, 0), 4), 0), Enum.at(Enum.at(Enum.at(blockarray, 0), 4), 1)],
       report_to: [Enum.at(Enum.at(Enum.at(blockarray, 0), 5), 0), Enum.at(Enum.at(Enum.at(blockarray, 0), 5), 1)],
@@ -27,7 +27,7 @@ defmodule Bundle_Manager do
     {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 5), :value)
     {:ok, specific_data_needed_bitstring_encoded} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 4), :value)
     {:ok, specific_data_decoded, ""} = CBOR.decode(specific_data_needed_bitstring_encoded)
-    canonicalblock = %Canonical_Block{block_type_code: Enum.at(Enum.at(blockarray, 0), 0),
+    canonicalblock = %Bpv7.Canonical_Block{block_type_code: Enum.at(Enum.at(blockarray, 0), 0),
       block_number: Enum.at(Enum.at(blockarray, 0), 1),
       block_control_flags: Enum.at(Enum.at(blockarray, 0), 2),
       crc_type: Enum.at(Enum.at(blockarray,0 ), 3),

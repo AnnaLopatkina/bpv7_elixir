@@ -1,4 +1,4 @@
-defmodule Block_Control_Flags do
+defmodule Bpv7.Block_Control_Flags do
   @moduledoc false
   use TypedStruct
 

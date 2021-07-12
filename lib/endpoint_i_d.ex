@@ -1,4 +1,4 @@
-defmodule EndpointID do
+defmodule Bpv7.EndpointID do
   @moduledoc false
   use TypedStruct
 

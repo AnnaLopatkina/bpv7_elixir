@@ -1,4 +1,4 @@
-defmodule Canonical_Block do
+defmodule Bpv7.Canonical_Block do
   @moduledoc false
   # @type t() :: %__MODULE__{}
   use TypedStruct

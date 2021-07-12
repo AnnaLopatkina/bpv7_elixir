@@ -1,4 +1,4 @@
-defmodule Creation_Time_Stamp do
+defmodule Bpv7.Creation_Time_Stamp do
   @moduledoc false
   use TypedStruct
 
