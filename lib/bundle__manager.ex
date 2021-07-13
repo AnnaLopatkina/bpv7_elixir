@@ -9,6 +9,26 @@ defmodule Bpv7.Bundle_Manager do
   #primaryarray = Bundle_Manager.primary_to_array(primary)
   #binary = Bundle_Manager.primaryarray_binary(primaryarray)
 
+  def forward_bundle(hexstring) do
+
+    #decode cbor to array
+    array = decode_cbor_bundle(hexstring)
+    
+    #get primaryblock
+    primaryblock = get_primary(array)
+    
+    #check primary crc
+    if !check_crc_primary(primaryblock) do
+      raise "primary crc not correct"
+    end
+
+    #delete primary block
+    canonical_array = List.delete_at(array, 0)
+
+    #check canonical crc
+    #Enum.each
+
+  end
 
   def get_primary(blockarray) do
     {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, 0), 8), :value)
@@ -73,6 +93,17 @@ defmodule Bpv7.Bundle_Manager do
 
   end
 
+  def canonicalarray_binary (canonicalarray) do
+    cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(canonicalarray) + 1, 16))
+
+    canonicalarray_bin = Enum.map(canonicalarray, fn(field) -> CBOR.encode(field) end)
+
+    canonicalarray_with_header = [cbor_array_header | canonicalarray_bin]
+    canonicalarray_complete = canonicalarray_with_header ++ [Base.decode16!("4400000000")]
+
+    Enum.join(canonicalarray_complete)
+  end
+
   def check_crc_primary(primaryblock) do
     primaryarray = primary_to_array(primaryblock)
     primarybinary = primaryarray_binary(primaryarray)
@@ -87,6 +118,22 @@ defmodule Bpv7.Bundle_Manager do
 
       end
 
+  end
+
+  def check_canonical_crc(blockarray, blocknumber) do
+    canonicalblock = get_canonical(blockarray, blocknumber)
+    canoncicalarray = canonical_to_array(canonicalblock)
+    canonicalbinary = canonicalarray_binary(canoncicalarray)
+
+    if canonicalblock.crc == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
+
+      true
+
+    else
+
+      false
+
+    end
   end
 
   #def create_previous_Node_Block() do
