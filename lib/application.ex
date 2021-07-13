@@ -13,5 +13,6 @@ defmodule Bpv7.Application do
     Supervisor.start_link(children, opts)
 
     Bpv7.ConnManager.start([])
+    Bpv7.BPA.start([])
   end
 end
