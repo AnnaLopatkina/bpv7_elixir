@@ -47,7 +47,7 @@ defmodule Bpv7.Server do
     data
   end
 
-  defp write_line(line, socket) do
+  defp write_line(line, _socket) do
     #:gen_tcp.send(socket, line)
     hex_data = Base.encode16(line)
     IO.puts(hex_data)

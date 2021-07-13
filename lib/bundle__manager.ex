@@ -25,6 +25,7 @@ defmodule Bpv7.Bundle_Manager do
     #delete primary block
     canonical_array = List.delete_at(array, 0)
 
+    canonical_array
     #check canonical crc
     #Enum.each
 
