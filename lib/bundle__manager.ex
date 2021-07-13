@@ -4,7 +4,7 @@ defmodule Bpv7.Bundle_Manager do
   @moduledoc false
 
   #Comands:
-  #bundle = Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009db3c6e53f121a000493e044f42e713e860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
+  #bundle = Bpv7.Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009db3c6e53f121a000493e044f42e713e860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
   #primary = Bundle_Manager.get_primary(bundle)
   #primaryarray = Bundle_Manager.primary_to_array(primary)
   #binary = Bundle_Manager.primaryarray_binary(primaryarray)
@@ -126,7 +126,7 @@ defmodule Bpv7.Bundle_Manager do
     canoncicalarray = canonical_to_array(canonicalblock)
     canonicalbinary = canonicalarray_binary(canoncicalarray)
 
-    if canonicalblock.crc == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
+    if canonicalblock.crc == Integer.to_string(ExCRC.crc16ccitt(canonicalbinary), 16) do
 
       true
 
