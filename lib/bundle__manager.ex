@@ -4,7 +4,7 @@ defmodule Bpv7.Bundle_Manager do
   @moduledoc false
 
   #Comands:
-  #bundle = Bpv7.Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009db3c6e53f121a000493e044f42e713e860a0200014482181e00423d78860703000141004237ed86010100014c48656c6c6f20576f726c64214204a7ff")
+  #bundle = Bpv7.Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009e3a0b75cf031a000493e044b201c5f4860a0200024482181e004487d25ff88607030002410044a0a52ecd86010100024c48656c6c6f20576f726c6421447585c26dff")
   #primary = Bundle_Manager.get_primary(bundle)
   #primaryarray = Bundle_Manager.primary_to_array(primary)
   #binary = Bundle_Manager.primaryarray_binary(primaryarray)
@@ -12,23 +12,42 @@ defmodule Bpv7.Bundle_Manager do
   def forward_bundle(hexstring) do
 
     #decode cbor to array
-    array = decode_cbor_bundle(hexstring)
-    
+    bundle_array = decode_cbor_bundle(hexstring)
+
+    #check the whole bundle crc
+    check_bundle_crc(bundle_array)
+
+  end
+
+  def check_bundle_crc(bundle_array) do
     #get primaryblock
-    primaryblock = get_primary(array)
-    
+    primaryblock = get_primary(bundle_array)
+
     #check primary crc
     if !check_crc_primary(primaryblock) do
       raise "primary crc not correct"
     end
 
     #delete primary block
-    canonical_array = List.delete_at(array, 0)
+    canonical_array = List.delete_at(bundle_array, 0)
 
-    canonical_array
     #check canonical crc
-    #Enum.each
+    if !check_canonical_crc_array(canonical_array) do
+      raise "canonical checksums not correct"
+    end
+  end
 
+  def check_canonical_crc_array(canonical_array) do
+    if length(canonical_array) > 1 do
+      canonical_block = get_canonical(canonical_array, 0)
+      canonical_array_new = List.delete_at(canonical_array, 0)
+
+      check_canonical_crc_array(canonical_array_new) && check_canonical_crc(canonical_block)
+    else
+      canonical_block = get_canonical(canonical_array, 0)
+
+      check_canonical_crc(canonical_block)
+    end
   end
 
   def get_primary(blockarray) do
@@ -47,15 +66,24 @@ defmodule Bpv7.Bundle_Manager do
   def get_canonical(blockarray, canonicalblocknumber) do
     {:ok, crc_needed_bitstring} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 5), :value)
     {:ok, specific_data_needed_bitstring_encoded} = Map.fetch(Enum.at(Enum.at(blockarray, canonicalblocknumber), 4), :value)
-    {:ok, specific_data_decoded, ""} = CBOR.decode(specific_data_needed_bitstring_encoded)
-    canonicalblock = %Bpv7.Canonical_Block{block_type_code: Enum.at(Enum.at(blockarray, 0), 0),
-      block_number: Enum.at(Enum.at(blockarray, 0), 1),
-      block_control_flags: Enum.at(Enum.at(blockarray, 0), 2),
-      crc_type: Enum.at(Enum.at(blockarray,0 ), 3),
+    specific_data_decoded = decode_specific_data(Enum.at(Enum.at(blockarray, canonicalblocknumber), 0), specific_data_needed_bitstring_encoded)
+    canonicalblock = %Bpv7.Canonical_Block{block_type_code: Enum.at(Enum.at(blockarray, canonicalblocknumber), 0),
+      block_number: Enum.at(Enum.at(blockarray, canonicalblocknumber), 1),
+      block_control_flags: Enum.at(Enum.at(blockarray, canonicalblocknumber), 2),
+      crc_type: Enum.at(Enum.at(blockarray, canonicalblocknumber), 3),
       block_type_specific_data: specific_data_decoded,
       crc: Base.encode16(crc_needed_bitstring)}
 
     canonicalblock
+  end
+
+  def decode_specific_data(blocktype, specific_data_needed_bitstring_encoded) do
+    if blocktype == 1 do
+      specific_data_needed_bitstring_encoded
+    else
+      {:ok, specific_data_decoded, ""} = CBOR.decode(specific_data_needed_bitstring_encoded)
+      specific_data_decoded
+    end
   end
 
   def decode_cbor_bundle(hexstring) do
@@ -73,17 +101,21 @@ defmodule Bpv7.Bundle_Manager do
 
   def canonical_to_array(canonicalblock) do
     canonicalarray = [canonicalblock.block_type_code, canonicalblock.block_number, canonicalblock.block_control_flags,
-      canonicalblock.crc_type, canonicalblock.block_type_specific_data, canonicalblock.crc]
+      canonicalblock.crc_type, canonical_to_array_specific_data(canonicalblock)]
 
     canonicalarray
   end
 
+  def canonical_to_array_specific_data(canonicalblock) do
+    if canonicalblock.block_type_code == 1 do
+      %CBOR.Tag{tag: :bytes, value: canonicalblock.block_type_specific_data}
+    else
+      %CBOR.Tag{tag: :bytes, value: CBOR.encode(canonicalblock.block_type_specific_data)}
+    end
+  end
+
   def primaryarray_binary (primaryarray) do
     cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(primaryarray) + 1, 16))
-
-    #for field <- primaryarray do
-    #  CBOR.encode(field)
-    #end
 
     primaryarray_bin = Enum.map(primaryarray, fn(field) -> CBOR.encode(field) end)
 
@@ -121,17 +153,17 @@ defmodule Bpv7.Bundle_Manager do
 
   end
 
-  def check_canonical_crc(blockarray, blocknumber) do
-    canonicalblock = get_canonical(blockarray, blocknumber)
+  def check_canonical_crc(canonicalblock) do
     canoncicalarray = canonical_to_array(canonicalblock)
     canonicalbinary = canonicalarray_binary(canoncicalarray)
 
-    if canonicalblock.crc == Integer.to_string(ExCRC.crc16ccitt(canonicalbinary), 16) do
+    if canonicalblock.crc == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
 
       true
 
     else
 
+    IO.puts("Blockcrc = #{canonicalblock.crc} ; calculatedcrc = #{Integer.to_string(:crc32cer.nif(canonicalbinary), 16)}")
       false
 
     end
