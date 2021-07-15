@@ -3,12 +3,6 @@ defmodule Bpv7.Bundle_Manager do
   use Bitwise
   @moduledoc false
 
-  #Comands:
-  #bundle = Bpv7.Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009e3a0b75cf031a000493e044b201c5f4860a0200024482181e004487d25ff88607030002410044a0a52ecd86010100024c48656c6c6f20576f726c6421447585c26dff")
-  #primary = Bundle_Manager.get_primary(bundle)
-  #primaryarray = Bundle_Manager.primary_to_array(primary)
-  #binary = Bundle_Manager.primaryarray_binary(primaryarray)
-
   def forward_bundle(hexstring) do
 
     #decode cbor to array
@@ -17,6 +11,31 @@ defmodule Bpv7.Bundle_Manager do
     #check the whole bundle crc
     check_bundle_crc(bundle_array)
 
+    #hop count block increase
+    bundle_array_hop = change_Hop_Count_Block(bundle_array)
+
+    #insert previous node block
+    bundle_array_previousNode = insert_previous_Node_Block(bundle_array_hop)
+
+    #bundle Ageblock
+    bundle_array_bundleAgeBlock = update_bundle_Age_Block(bundle_array_previousNode)
+
+    #return concatinated cbor binary
+    <<159>> <> bundleblock_binary(bundle_array_bundleAgeBlock) <> <<255>>
+
+  end
+
+  def bundleblock_binary(bundlearray) do
+    if length(bundlearray) > 1 do
+      blockarray = Enum.at(bundlearray, 0)
+      bundlearray_new = List.delete_at(bundlearray, 0)
+
+      array_binary_nocrc(blockarray) <> bundleblock_binary(bundlearray_new)
+    else
+      blockarray = Enum.at(bundlearray, 0)
+
+      array_binary_nocrc(blockarray)
+    end
   end
 
   def check_bundle_crc(bundle_array) do
@@ -114,32 +133,31 @@ defmodule Bpv7.Bundle_Manager do
     end
   end
 
-  def primaryarray_binary (primaryarray) do
-    cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(primaryarray) + 1, 16))
+  def array_binary(array) do
+    cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(array) + 1, 16))
 
-    primaryarray_bin = Enum.map(primaryarray, fn(field) -> CBOR.encode(field) end)
+    array_bin = Enum.map(array, fn(field) -> CBOR.encode(field) end)
 
-    first_array = [cbor_array_header | primaryarray_bin]
-    array_ready_crc = first_array ++ [Base.decode16!("4400000000")]
+    array_bin_header = [cbor_array_header | array_bin]
+    array_ready_crc = array_bin_header ++ [Base.decode16!("4400000000")]
 
     Enum.join(array_ready_crc)
 
   end
 
-  def canonicalarray_binary (canonicalarray) do
-    cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(canonicalarray) + 1, 16))
+  def array_binary_nocrc(array) do
+    cbor_array_header = Base.decode16!(Integer.to_string(0x80 ||| length(array), 16))
 
-    canonicalarray_bin = Enum.map(canonicalarray, fn(field) -> CBOR.encode(field) end)
+    array_bin = Enum.map(array, fn(field) -> CBOR.encode(field) end)
 
-    canonicalarray_with_header = [cbor_array_header | canonicalarray_bin]
-    canonicalarray_complete = canonicalarray_with_header ++ [Base.decode16!("4400000000")]
+    array_bin_header = [cbor_array_header | array_bin]
 
-    Enum.join(canonicalarray_complete)
+    Enum.join(array_bin_header)
   end
 
   def check_crc_primary(primaryblock) do
     primaryarray = primary_to_array(primaryblock)
-    primarybinary = primaryarray_binary(primaryarray)
+    primarybinary = array_binary(primaryarray)
 
     if primaryblock.crc == Integer.to_string(:crc32cer.nif(primarybinary), 16) do
 
@@ -155,7 +173,7 @@ defmodule Bpv7.Bundle_Manager do
 
   def check_canonical_crc(canonicalblock) do
     canoncicalarray = canonical_to_array(canonicalblock)
-    canonicalbinary = canonicalarray_binary(canoncicalarray)
+    canonicalbinary = array_binary(canoncicalarray)
 
     if canonicalblock.crc == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
 
@@ -169,31 +187,72 @@ defmodule Bpv7.Bundle_Manager do
     end
   end
 
-  #def create_previous_Node_Block() do
-    #previousNodeBlock = %Canonical_Block{block_type_code: 10, block_number: ,
-      #block_control_flags: , crc_type: , block_type_specific_data:  , crc:}
 
-    #previousNodeBlock
-  #end
+  def insert_previous_Node_Block(bundlearray) do
+
+    specific_data = "dtn://lawa.dtn"
+
+    previousNodeBlock_array = [6, 4, 0, 2, %CBOR.Tag{tag: :bytes, value: CBOR.encode(specific_data)}]
+
+    previous_node_binary = array_binary(previousNodeBlock_array)
+    crc_new = %CBOR.Tag{tag: :bytes, value: <<:crc32cer.nif(previous_node_binary)::32>>}
+
+    previousNodeBlock_array_crc = previousNodeBlock_array ++ [crc_new]
+
+    List.insert_at(bundlearray, length(bundlearray) - 1, previousNodeBlock_array_crc)
+  end
+
+  def update_bundle_Age_Block(bundlearray) do
+
+    bundleAgeBlock = get_canonical(bundlearray, 2)
+    bundleAgeBlockArray = canonical_to_array(bundleAgeBlock)
+
+    primaryBlock = get_primary(bundlearray)
+    creation_milliseconds = Enum.at(primaryBlock.creation_time_stamp, 0)
+
+    bpv7_epoch = "2000-01-01 00:00:00"
+    bpv7_epoch_date = Timex.parse!(bpv7_epoch, "%Y-%m-%d %H:%M:%S", :strftime)
+    bpv7_epoch_milliseconds = DateTime.to_unix(Timex.to_datetime(bpv7_epoch_date), :millisecond)
+
+    specific_data = %CBOR.Tag{tag: :bytes, value: CBOR.encode(DateTime.to_unix(Timex.now(), :millisecond) - creation_milliseconds - bpv7_epoch_milliseconds)}
+
+    bundleAgeBlockArray_edited = List.replace_at(bundleAgeBlockArray, 4, specific_data)
+
+    bundleAgeBlockArray_edited_binary = array_binary(bundleAgeBlockArray_edited)
+    crc_new = %CBOR.Tag{tag: :bytes, value: <<:crc32cer.nif(bundleAgeBlockArray_edited_binary)::32>>}
+
+    bundleAgeBlockFinish = bundleAgeBlockArray_edited ++ [crc_new]
+
+    List.replace_at(bundlearray, 2, bundleAgeBlockFinish)
+  end
 
   def change_Hop_Count_Block(bundlearray) do
 
     hopCountBlock = get_canonical(bundlearray, 1)
     hopCountBlockArray = canonical_to_array(hopCountBlock)
 
-    hopLimit = Enum.at(Enum.at(hopCountBlockArray, 4), 0)
-    hopCount = Enum.at(Enum.at(hopCountBlockArray, 4), 1)
+    {:ok, specific_data_encoded} = Map.fetch(Enum.at(hopCountBlockArray, 4), :value)
+    {:ok, specific_data_decoded, ""} = CBOR.decode(specific_data_encoded)
+    hopCountBlockArray_decoded = List.replace_at(hopCountBlockArray, 4, specific_data_decoded)
+
+    hopLimit = Enum.at(Enum.at(hopCountBlockArray_decoded, 4), 0)
+    hopCount = Enum.at(Enum.at(hopCountBlockArray_decoded, 4), 1)
 
 
     if hopCount < hopLimit do
 
-      hopCountAndLimit = [hopLimit, hopCount + 1]
-      updatedHopCountBlockArray = List.replace_at(hopCountBlockArray, 4, hopCountAndLimit)
+      hopCountAndLimit = %CBOR.Tag{tag: :bytes, value: CBOR.encode([hopLimit, hopCount + 1])}
+      updatedHopCountBlockArray = List.replace_at(hopCountBlockArray_decoded, 4, hopCountAndLimit)
 
-      updatedHopCountBlockArray
+      updatedHopCountBlockArray_bin = array_binary(updatedHopCountBlockArray)
+      crc_new = %CBOR.Tag{tag: :bytes, value: <<:crc32cer.nif(updatedHopCountBlockArray_bin)::32>>}
+
+      updatedHopCountBlockArray_crc = updatedHopCountBlockArray ++ [crc_new]
+
+      List.replace_at(bundlearray, 1, updatedHopCountBlockArray_crc)
 
     else
-    :false
+    raise "hopLimit reached"
     end
   end
 
