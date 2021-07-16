@@ -3,10 +3,10 @@ defmodule Bpv7.Bundle_Manager do
   use Bitwise
   @moduledoc false
 
-  def forward_bundle(hexstring) do
+  def forward_bundle(bundle_array) do
 
     #decode cbor to array
-    bundle_array = decode_cbor_bundle(hexstring)
+    #bundle_array = decode_cbor_bundle(hexstring)
 
     #check the whole bundle crc
     check_bundle_crc(bundle_array)
@@ -22,6 +22,8 @@ defmodule Bpv7.Bundle_Manager do
 
     #return concatinated cbor binary
     <<159>> <> bundleblock_binary(bundle_array_bundleAgeBlock) <> <<255>>
+
+    :ok
 
   end
 
