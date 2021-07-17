@@ -17,9 +17,6 @@ defmodule Bpv7.Bundle_Manager do
     #insert previous node block
     bundle_array_previousNode = insert_previous_Node_Block(bundle_array_hop)
 
-    #bundle Ageblock
-    bundle_array_bundleAgeBlock = update_bundle_Age_Block(bundle_array_previousNode)
-
     #get source eid
     source_eid = Enum.at(Enum.at(Enum.at(bundle_array_previousNode, 0), 3), 1)
 
@@ -172,7 +169,7 @@ defmodule Bpv7.Bundle_Manager do
     primaryarray = primary_to_array(primaryblock)
     primarybinary = array_binary(primaryarray)
 
-    if primaryblock.crc == Integer.to_string(:crc32cer.nif(primarybinary), 16) do
+    if Integer.to_string(Base.decode16!(primaryblock.crc), 16) == Integer.to_string(:crc32cer.nif(primarybinary), 16) do
 
       true
 
@@ -188,7 +185,7 @@ defmodule Bpv7.Bundle_Manager do
     canoncicalarray = canonical_to_array(canonicalblock)
     canonicalbinary = array_binary(canoncicalarray)
 
-    if canonicalblock.crc == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
+    if Integer.to_string(Base.decode16!(canonicalblock.crc), 16) == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
 
       true
 
