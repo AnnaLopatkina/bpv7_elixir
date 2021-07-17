@@ -25,13 +25,13 @@ defmodule Bpv7.Server do
 
   defp serve(socket) do
     socket
-    |> read_line(nil)
-    |> write_line(socket)
+    |> read(nil)
+    |> forward()
 
     serve(socket)
   end
 
-  defp read_line(socket, parent) do
+  defp read(socket, parent) do
     {:ok, chunk} = :gen_tcp.recv(socket, 0)
     data =
       case parent do
@@ -42,14 +42,16 @@ defmodule Bpv7.Server do
       {:ok, plain_data, ""} = CBOR.decode(data)
       plain_data
     rescue
-      MatchError -> read_line(socket, data)
+      MatchError -> read(socket, data)
     end
     data
   end
 
-  defp write_line(line, _socket) do
-    #:gen_tcp.send(socket, line)
-    hex_data = Base.encode16(<<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(line) <> <<255>>)
+  defp forward(bundle) do
+    {:ok,bundle} = Map.fetch(bundle,:value)
+    {:ok, bundle, ""} = CBOR.decode(bundle)
+    hex_data = Base.encode16(<<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(bundle) <> <<255>>)
     IO.puts(hex_data)
+    :ok = Bpv7.Bundle_Manager.forward_bundle(bundle)
   end
 end

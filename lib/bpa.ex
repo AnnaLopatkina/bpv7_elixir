@@ -59,7 +59,8 @@ defmodule Bpv7.BPA do
       :ok -> nil
     end
     bundle_updated_AgeBlock = Bpv7.Bundle_Manager.update_bundleAgeBlock(bundle)
-    Bpv7.ConnManager.send(host, port, bundle_updated_AgeBlock)
+    bundle_encoded = CBOR.encode(%CBOR.Tag{tag: :bytes, value: bundle_updated_AgeBlock})
+    Bpv7.ConnManager.send(host, port, bundle_encoded)
     {:noreply, state}
   end
 
