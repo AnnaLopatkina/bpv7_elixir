@@ -21,13 +21,21 @@ defmodule Bpv7.Bundle_Manager do
     bundle_array_bundleAgeBlock = update_bundle_Age_Block(bundle_array_previousNode)
 
     #get source eid
-    source_eid = Enum.at(Enum.at(Enum.at(bundle_array_bundleAgeBlock, 0), 3), 1)
+    source_eid = Enum.at(Enum.at(Enum.at(bundle_array_previousNode, 0), 3), 1)
 
     #schedule cbor binary bundle to source eid
-    Bpv7.BPA.schedule_bundle(<<159>> <> bundleblock_binary(bundle_array_bundleAgeBlock) <> <<255>>, source_eid)
+    Bpv7.BPA.schedule_bundle(<<159>> <> bundleblock_binary(bundle_array_previousNode) <> <<255>>, source_eid)
 
     :ok
 
+  end
+
+  #insert bundleAgeBlock shortly before bundle is going to be sended
+  def update_bundleAgeBlock(binary_bundle) do
+    bundle_array = decode_cbor_bundle(binary_bundle)
+    bundle_array_bundleAgeBlock = update_bundle_Age_Block(bundle_array)
+
+    <<159>> <> bundleblock_binary(bundle_array_bundleAgeBlock) <> <<255>>
   end
 
   def bundleblock_binary(bundlearray) do

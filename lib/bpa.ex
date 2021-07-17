@@ -58,7 +58,8 @@ defmodule Bpv7.BPA do
       :not_found -> :ok = Bpv7.ConnManager.connect(host, port)
       :ok -> nil
     end
-    Bpv7.ConnManager.send(host, port, bundle)
+    bundle_updated_AgeBlock = Bpv7.Bundle_Manager.update_bundleAgeBlock(bundle)
+    Bpv7.ConnManager.send(host, port, bundle_updated_AgeBlock)
     {:noreply, state}
   end
 
