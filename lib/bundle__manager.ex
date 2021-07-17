@@ -32,7 +32,7 @@ defmodule Bpv7.Bundle_Manager do
 
   #insert bundleAgeBlock shortly before bundle is going to be sended
   def update_bundleAgeBlock(binary_bundle) do
-    bundle_array = decode_cbor_bundle(binary_bundle)
+    {:ok, bundle_array, ""} = CBOR.decode(binary_bundle)
     bundle_array_bundleAgeBlock = update_bundle_Age_Block(bundle_array)
 
     <<159>> <> bundleblock_binary(bundle_array_bundleAgeBlock) <> <<255>>
