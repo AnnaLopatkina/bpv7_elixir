@@ -49,7 +49,7 @@ defmodule Bpv7.Server do
 
   defp write_line(line, _socket) do
     #:gen_tcp.send(socket, line)
-    hex_data = Base.encode16(line)
+    hex_data = Base.encode16(<<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(line) <> <<255>>)
     IO.puts(hex_data)
   end
 end
