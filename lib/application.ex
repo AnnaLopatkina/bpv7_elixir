@@ -7,7 +7,8 @@ defmodule Bpv7.Application do
     port = String.to_integer(System.get_env("PORT") || "4040")
     children = [
       {Task.Supervisor, name: Bpv7.Server.TaskSupervisor},
-      {Task, fn -> Bpv7.Server.accept(port) end},
+      Supervisor.child_spec({Task, fn -> Bpv7.Server.accept(port) end}, id: :Bpv7Server),
+      Supervisor.child_spec({Task, fn -> Bpv7.Config_server.accept(4041) end}, id: :Bpv7ConfigServer),
       Bpv7.BPA
     ]
 
