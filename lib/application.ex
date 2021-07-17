@@ -4,9 +4,10 @@ defmodule Bpv7.Application do
   use Application
 
   def start(_type, _args) do
+    port = String.to_integer(System.get_env("PORT") || "4040")
     children = [
       {Task.Supervisor, name: Bpv7.Server.TaskSupervisor},
-      {Task, fn -> Bpv7.Server.accept(4040) end},
+      {Task, fn -> Bpv7.Server.accept(port) end},
       Bpv7.BPA
     ]
 
