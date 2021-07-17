@@ -1,3 +1,4 @@
+version: '3'
 services:
   ud3tn-node:
     image: registry.gitlab.com/d3tn/ud3tn-docker-images/ud3tn
