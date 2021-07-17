@@ -12,7 +12,7 @@ defmodule Bpv7.Config_server do
     #
     {:ok, socket} =
       :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
-    Logger.info("Accepting connections on port #{port}")
+    Logger.info("Accepting config on port #{port}")
     loop_acceptor(socket)
   end
 
@@ -20,7 +20,7 @@ defmodule Bpv7.Config_server do
     {:ok, client} = :gen_tcp.accept(socket)
     {:ok, pid} = Task.Supervisor.start_child(Bpv7.Server.TaskSupervisor, fn -> serve(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
-    IO.puts "Connected"
+    Logger.info("config Session Connected")
     loop_acceptor(socket)
   end
 
@@ -33,13 +33,13 @@ defmodule Bpv7.Config_server do
   defp read_line(socket) do
     {:ok, data} = :gen_tcp.recv(socket, 0)
     data = String.trim(data, "\r\n")
-    IO.inspect binding()
     data = String.split(data, ",", parts: 5)
-    IO.inspect binding()
     {:ok, begin_time, 0} = DateTime.from_iso8601(Enum.at(data,3))
     {:ok, end_time, 0} = DateTime.from_iso8601(Enum.at(data,4))
-    IO.inspect binding()
-    Bpv7.BPA.add_tcp_node(Enum.at(data,0), Enum.at(data,1), Enum.at(data,2), begin_time, end_time)
+    eid = Enum.at(data, 0)
+    host = to_charlist(Enum.at(data,1))
+    port = String.to_integer(Enum.at(data,2))
+    Bpv7.BPA.add_tcp_node(eid, host, port, begin_time, end_time)
   end
 
 end
