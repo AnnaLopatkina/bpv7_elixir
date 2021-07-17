@@ -44,7 +44,7 @@ defmodule Bpv7.BPA do
       schedule_time < 0 ->
         0
       true ->
-        schedule_time
+        schedule_time * 1000
     end
     Process.send_after(__MODULE__,{:send, bundle, eid}, schedule_time)
     :ok
