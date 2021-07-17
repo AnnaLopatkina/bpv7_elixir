@@ -19,7 +19,7 @@ defmodule Bpv7.ConnManager do
   end
 
   def connect(host, port) do
-    {:ok, socket} = :gen_tcp.connect(host, port, [])
+    {:ok, socket} = :gen_tcp.connect(host, port, [:binary])
     Agent.update(__MODULE__, &Map.put(&1, {host, port}, socket))
    end
 
