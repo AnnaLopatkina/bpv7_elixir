@@ -169,7 +169,10 @@ defmodule Bpv7.Bundle_Manager do
     primaryarray = primary_to_array(primaryblock)
     primarybinary = array_binary(primaryarray)
 
-    if Integer.to_string(Base.decode16!(primaryblock.crc), 16) == Integer.to_string(:crc32cer.nif(primarybinary), 16) do
+    {set_crc, ""} = Integer.parse(Base.decode16!(primaryblock.crc),16)
+    calculated_crc = Integer.to_string(:crc32cer.nif(primarybinary), 16)
+
+    if set_crc == calculated_crc do
 
       true
 
@@ -185,7 +188,10 @@ defmodule Bpv7.Bundle_Manager do
     canoncicalarray = canonical_to_array(canonicalblock)
     canonicalbinary = array_binary(canoncicalarray)
 
-    if Integer.to_string(Base.decode16!(canonicalblock.crc), 16) == Integer.to_string(:crc32cer.nif(canonicalbinary), 16) do
+    {set_crc, ""} = Integer.parse(Base.decode16!(canonicalblock.crc),16)
+    calculated_crc = Integer.to_string(:crc32cer.nif(canonicalbinary), 16)
+
+    if set_crc == calculated_crc do
 
       true
 
