@@ -41,8 +41,8 @@ defmodule Bundlemanager_test do
    hop_limit_updated = Enum.at(specific_data_decoded, 0)
     hop_count_updated = Enum.at(specific_data_decoded, 1)
 
-    assert hop_limit = hop_limit_updated
-    assert hop_count + 1 = hop_count_updated
+    assert hop_limit == hop_limit_updated
+    assert hop_count + 1 == hop_count_updated
   end
 
   test "hop_count_block fail" do
