@@ -63,7 +63,7 @@ defmodule Bundlemanager_test do
   end
 
   test "bundle_age_block" do
-    bundle_binary_updated = Bpv7.Bundle_Manager.update_bundleAgeBlock("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009e3a0b75cf031a000493e044b201c5f4860a0200024482181e004487d25ff88607030002410044a0a52ecd86010100024c48656c6c6f20576f726c6421447585c26dff")
+    bundle_binary_updated = Bpv7.Bundle_Manager.update_bundleAgeBlock(Base.decode16!(String.upcase("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009e3a0b75cf031a000493e044b201c5f4860a0200024482181e004487d25ff88607030002410044a0a52ecd86010100024c48656c6c6f20576f726c6421447585c26dff")))
     {:ok, bundle_array_updated, ""} = CBOR.decode(bundle_binary_updated)
     blocktype = Enum.at(Enum.at(bundle_array_updated, 2), 0)
     {:ok, milliseconds_encoded} = Map.fetch(Enum.at(Enum.at(bundle_array_updated, 2), 4), :value)
