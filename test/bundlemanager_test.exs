@@ -52,4 +52,14 @@ defmodule Bundlemanager_test do
     Bpv7.Bundle_Manager.change_Hop_Count_Block(bundle_array)
     end
   end
+
+  test "insert_previous_node_block" do
+    bundle_array = Bpv7.Bundle_Manager.decode_cbor_bundle("9f890700028201722f2f632e64746e2f62756e646c6573696e6b8201672f2f612e64746e820100821b0000009e3a0b75cf031a000493e044b201c5f4860a0200024482181e004487d25ff88607030002410044a0a52ecd86010100024c48656c6c6f20576f726c6421447585c26dff")
+    bundle_array_previousNodeBlock = Bpv7.Bundle_Manager.insert_previous_Node_Block(bundle_array)
+    blocktype = Enum.at(Enum.at(bundle_array_previousNodeBlock, length(bundle_array_previousNodeBlock)-2), 0)
+
+    assert length(bundle_array_previousNodeBlock) == 5
+    assert blocktype == 6
+
+  end
 end
