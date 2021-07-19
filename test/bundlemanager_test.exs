@@ -79,9 +79,7 @@ defmodule Bundlemanager_test do
     bundle_binary = <<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(bundle_array) <> <<255>>
 
     {:ok, bundle_array_dec, ""} = CBOR.decode(bundle_binary)
-    bundle_binary_enc = CBOR.encode(bundle_array)
 
     assert bundle_array_dec == bundle_array
-    assert bundle_binary_enc == bundle_binary
   end
 end
