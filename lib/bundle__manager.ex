@@ -64,6 +64,7 @@ defmodule Bpv7.Bundle_Manager do
     if !check_canonical_crc_array(canonical_array) do
       raise "canonical checksums not correct"
     end
+    :ok
   end
 
   def check_canonical_crc_array(canonical_array) do
