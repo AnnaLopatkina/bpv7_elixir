@@ -18,10 +18,10 @@ defmodule Bpv7.Bundle_Manager do
     bundle_array_previousNode = insert_previous_Node_Block(bundle_array_hop)
 
     #get source eid
-    source_eid = Enum.at(Enum.at(Enum.at(bundle_array_previousNode, 0), 3), 1)
+    dest_eid = Enum.at(Enum.at(Enum.at(bundle_array_previousNode, 0), 3), 1)
 
     #schedule cbor binary bundle to source eid
-    Bpv7.BPA.schedule_bundle(<<159>> <> bundleblock_binary(bundle_array_previousNode) <> <<255>>, source_eid)
+    Bpv7.BPA.schedule_bundle(<<159>> <> bundleblock_binary(bundle_array_previousNode) <> <<255>>, dest_eid)
 
     :ok
 
@@ -64,6 +64,7 @@ defmodule Bpv7.Bundle_Manager do
     if !check_canonical_crc_array(canonical_array) do
       raise "canonical checksums not correct"
     end
+    :ok
   end
 
   def check_canonical_crc_array(canonical_array) do
