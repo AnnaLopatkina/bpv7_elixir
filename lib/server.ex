@@ -17,41 +17,54 @@ defmodule Bpv7.Server do
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
+    {:ok, {address, port}} = :inet.peername(client)
+    address = address |> Tuple.to_list |> Enum.join(".")
+    Logger.info("Incoming Connection from #{address}:#{port}.")
     {:ok, pid} = Task.Supervisor.start_child(Bpv7.Server.TaskSupervisor, fn -> serve(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
-    IO.puts "Connected"
     loop_acceptor(socket)
   end
 
   defp serve(socket) do
-    socket
-    |> read(nil)
-    |> forward()
-
-    serve(socket)
+    case read(socket, nil) do
+      {:ok, bundle} ->
+        forward(bundle)
+        serve(socket)
+      :error ->
+        nil
+    end
   end
 
   defp read(socket, parent) do
-    {:ok, chunk} = :gen_tcp.recv(socket, 0)
-    data =
-      case parent do
-        nil -> chunk
-        _ -> parent <> chunk
-      end
-    data = try do
-      {:ok, plain_data, ""} = CBOR.decode(data)
-      plain_data
-    rescue
-      MatchError -> read(socket, data)
+    response = case :gen_tcp.recv(socket, 0) do
+      {:ok, chunk} ->
+        data =
+          case parent do
+            nil -> chunk
+            _ -> parent <> chunk
+          end
+        data = try do
+          {:ok, plain_data, ""} = CBOR.decode(data)
+          plain_data
+        rescue
+          MatchError -> read(socket, data)
+        end
+        {:ok, data}
+      {:error, :closed} ->
+        Logger.info("Connection closed.")
+        :error
+      {:error, error} ->
+        Logger.info("Connection closed with error #{error}")
+        :error
     end
-    data
+    response
   end
 
   defp forward(bundle) do
     {:ok,bundle} = Map.fetch(bundle,:value)
     {:ok, bundle, ""} = CBOR.decode(bundle)
     hex_data = Base.encode16(<<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(bundle) <> <<255>>)
-    IO.puts(hex_data)
+    Logger.info("Bundle Received: ${hex_data}")
     :ok = Bpv7.Bundle_Manager.forward_bundle(bundle)
   end
 end
