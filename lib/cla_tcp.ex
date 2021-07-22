@@ -1,4 +1,4 @@
-defmodule Bpv7.Server do
+defmodule Bpv7.CLA_tcp do
   require Logger
 
   def accept(port) do
@@ -20,7 +20,7 @@ defmodule Bpv7.Server do
     {:ok, {address, port}} = :inet.peername(client)
     address = address |> Tuple.to_list |> Enum.join(".")
     Logger.info("Incoming Connection from #{address}:#{port}.")
-    {:ok, pid} = Task.Supervisor.start_child(Bpv7.Server.TaskSupervisor, fn -> serve(client) end)
+    {:ok, pid} = Task.Supervisor.start_child(Bpv7.CLA_tcp.TaskSupervisor, fn -> serve(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
     loop_acceptor(socket)
   end

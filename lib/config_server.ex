@@ -18,7 +18,7 @@ defmodule Bpv7.Config_server do
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    {:ok, pid} = Task.Supervisor.start_child(Bpv7.Server.TaskSupervisor, fn -> serve(client) end)
+    {:ok, pid} = Task.Supervisor.start_child(Bpv7.CLA_tcp.TaskSupervisor, fn -> serve(client) end)
     :ok = :gen_tcp.controlling_process(client, pid)
     Logger.info("config Session Connected")
     loop_acceptor(socket)
