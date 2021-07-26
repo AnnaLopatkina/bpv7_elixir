@@ -1,6 +1,7 @@
 defmodule Bpv7.BPA do
   use Agent
   use GenServer
+  require Logger
 
   @doc """
   Starts a new Instance of the Bundle Protocol Agent (BPA)
@@ -22,32 +23,56 @@ defmodule Bpv7.BPA do
   end
 
   def get_connection_method(eid) do
-    {method, _, _, _, _} = Agent.get(:nodes, &Map.get(&1, eid))
+    method =
+      case Agent.get(:nodes, &Map.get(&1, eid)) do
+        {method, _, _, _, _} -> method
+        nil -> :not_found
+      end
     method
   end
 
   def get_tcp_conn_details(eid) do
-    {:tcp, host, port, _, _ } = Agent.get(:nodes, &Map.get(&1, eid))
-    {host, port}
+    details =
+      case Agent.get(:nodes, &Map.get(&1, eid)) do
+        {:tcp, host, port, _, _ } -> {host, port}
+        nil -> :not_found
+      end
+    details
   end
 
   def get_availability(eid) do
-    {_, _, _, avail_begin, avail_end} = Agent.get(:nodes, &Map.get(&1, eid))
-    {avail_begin, avail_end}
+    details =
+      case Agent.get(:nodes, &Map.get(&1, eid)) do
+        {_, _, _, avail_begin, avail_end} -> {avail_begin, avail_end}
+        nil -> :not_found
+      end
+    details
   end
 
   def schedule_bundle(bundle, eid) do
-    {avail_begin, avail_end} = get_availability(eid)
-    current_time = DateTime.utc_now()
-    schedule_time = DateTime.diff(avail_begin, current_time)
-    schedule_time = cond do
-      schedule_time < 0 ->
-        0
-      true ->
-        schedule_time * 1000
+    {schedule_task, schedule_time} =
+    case get_availability(eid) do
+      {avail_begin, avail_end} ->
+        current_time = DateTime.utc_now()
+        schedule_time = DateTime.diff(avail_begin, current_time)
+        schedule_time = cond do
+          schedule_time < 0 ->
+            0
+          true ->
+            schedule_time * 1000
+        end
+        {:send, schedule_time}
+      :not_found ->
+        Logger.info("No configuration found for #{eid}. Trying again in 5 seconds.")
+        {:schedule, 5000}
     end
-    Process.send_after(__MODULE__,{:send, bundle, eid}, schedule_time)
+    Process.send_after(__MODULE__,{schedule_task, bundle, eid}, schedule_time)
     :ok
+  end
+
+  def handle_info({:schedule, bundle, eid}, state) do
+    schedule_bundle(bundle, eid)
+    {:noreply, state}
   end
 
   def handle_info({:send, bundle, eid}, state) do
