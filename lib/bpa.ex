@@ -4,7 +4,7 @@ defmodule Bpv7.BPA do
   require Logger
   @moduledoc """
   The Bundle Protocol Agent (BPA) holds the connection information for the EIDs.
-  It saves the connection Protocol, host, port und the times of availablity for every EID and gives the posibility to
+  It saves the connection Protocol, host, port and the times of availability for every EID and gives the possibility to
   receive this information from the BPA.
 
   Furthermore it does the scheduling of packages and delays them until a suitable node is available.
