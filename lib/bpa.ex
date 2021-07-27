@@ -111,16 +111,21 @@ defmodule Bpv7.BPA do
   end
 
   @doc """
+  Callback for Events which should happen later.
+  There are different Functions that can be distinguished by the Atom at the begginning of the argument tuple.
+  The available Function will be described below.
+
+  `{:schedule, bundle, eid}`
   Callback to retry the Scheduling of the Bundle if there was no suitable configuration at the previous attempt.
+
+  `{:send, bundle, eid}`
+  Callback for sending the bundle when the configured Availability time is reached.
   """
   def handle_info({:schedule, bundle, eid}, state) do
     schedule_bundle(bundle, eid)
     {:noreply, state}
   end
 
-  @doc """
-  Callback for sending the bundle when the configured Availability time is reached.
-  """
   def handle_info({:send, bundle, eid}, state) do
     :tcp = get_connection_method(eid)
     {host, port} = get_tcp_conn_details(eid)
