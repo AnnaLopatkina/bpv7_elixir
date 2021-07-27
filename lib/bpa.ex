@@ -27,6 +27,9 @@ defmodule Bpv7.BPA do
 
   def add_tcp_node(eid, host, port, avail_begin, avail_end) do
     :ok = Agent.update(:nodes, &Map.put(&1, eid, {:tcp, host, port, avail_begin, avail_end}))
+    schedule_time = Bpv7.Helpers.get_schedule_time(avail_begin)
+    Process.send_after(__MODULE__, {:connect_tcp, eid}, schedule_time)
+    :ok
   end
 
   def get_connection_method(eid) do
@@ -85,7 +88,8 @@ defmodule Bpv7.BPA do
   end
 
   defp remove_node(eid) do
-    Agent.update(:nodes, &Map.delete(&1, eid))
+    {:tcp, host, port, _, _} = Agent.get_and_update(:nodes, &Map.pop(&1, eid))
+    :ok = Bpv7.ConnManager.disconnect(host, port)
     Logger.info("Entry of #{eid} was removed because it is outdated.")
     :ok
   end
@@ -140,4 +144,16 @@ defmodule Bpv7.BPA do
     {:noreply, state}
   end
 
+  def handle_info({:connect_tcp, eid}, state) do
+    {:tcp, host, port, _, _} = get_node(eid)
+    unless Bpv7.ConnManager.check_connection?(host, port) do
+      Bpv7.ConnManager.connect(host, port)
+    end
+    {:noreply, state}
+  end
+
+  def handle_info({:tcp_closed, _}, state) do
+    Logger.info("Outgoing connection to peer closed.")
+    {:noreply, state}
+  end
 end

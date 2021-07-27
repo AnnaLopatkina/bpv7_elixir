@@ -4,8 +4,6 @@ defmodule Bpv7.BPA_test do
   test "add and save node" do
     assert Bpv7.BPA.get_tcp_conn_details("dtn://test.dtn") == :not_found
 
-    {:ok, begin_time, 0} = DateTime.from_iso8601("2021-07-17T13:05:00Z")
-    {:ok, end_time, 0} = DateTime.from_iso8601("2021-07-19T23:48:00Z")
     current_time = DateTime.utc_now()
     end_time = DateTime.add(current_time, 3600, :second)
     Bpv7.BPA.add_tcp_node("dtn://test.dtn",'localhost', 4040, current_time, end_time)

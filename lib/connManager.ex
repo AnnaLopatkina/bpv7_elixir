@@ -31,6 +31,13 @@ defmodule Bpv7.ConnManager do
     end
   end
 
+  def check_connection?(host, port) do
+    case check_connection(host, port) do
+      :ok -> true
+      :not_found -> false
+    end
+  end
+
   @doc """
   Connects to a given host and port.
 
@@ -57,8 +64,20 @@ defmodule Bpv7.ConnManager do
    end
 
    def send(host, port, packet) do
-     socket = Agent.get(__MODULE__, &Map.get(&1, {host, port}))
+     socket = get_socket(host, port)
      :ok = :gen_tcp.send(socket, packet)
+  end
+
+  def disconnect(host, port) do
+    socket = get_socket(host, port)
+    unless socket == nil do
+      :gen_tcp.shutdown(socket, :read_write)
+    end
+    :ok
+  end
+
+  defp get_socket(host, port) do
+    Agent.get(__MODULE__, &Map.get(&1, {host, port}))
   end
 
 end
