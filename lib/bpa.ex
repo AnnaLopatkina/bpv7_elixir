@@ -30,12 +30,10 @@ defmodule Bpv7.BPA do
   end
 
   def get_connection_method(eid) do
-    method =
-      case Agent.get(:nodes, &Map.get(&1, eid)) do
-        {method, _, _, _, _} -> method
-        nil -> :not_found
-      end
-    method
+    case get_node(eid) do
+      {method, _, _, _, _} -> method
+      :not_found -> :not_found
+    end
   end
 
   @doc """
@@ -44,12 +42,10 @@ defmodule Bpv7.BPA do
   If no suitable configuration is found `:not_found` will be returned.
   """
   def get_tcp_conn_details(eid) do
-    details =
-      case Agent.get(:nodes, &Map.get(&1, eid)) do
-        {:tcp, host, port, _, _ } -> {host, port}
-        nil -> :not_found
-      end
-    details
+    case get_node(eid) do
+      {:tcp, host, port, _, _ } -> {host, port}
+      :not_found -> :not_found
+    end
   end
 
   @doc """
@@ -59,12 +55,39 @@ defmodule Bpv7.BPA do
   If no suitable configuration is found `:not_found` will be returned.
   """
   def get_availability(eid) do
-    details =
-      case Agent.get(:nodes, &Map.get(&1, eid)) do
-        {_, _, _, avail_begin, avail_end} -> {avail_begin, avail_end}
-        nil -> :not_found
-      end
-    details
+    case get_node(eid) do
+      {_, _, _, avail_begin, avail_end} -> {avail_begin, avail_end}
+      :not_found -> :not_found
+    end
+  end
+
+  defp ongoing?(end_time) do
+    current_time = DateTime.utc_now()
+    case DateTime.compare(end_time, current_time) do
+     :gt -> true
+     :eq -> false
+     :lt -> false
+    end
+  end
+
+  defp get_node(eid) do
+    case Agent.get(:nodes, &Map.get(&1, eid)) do
+      {method, host, port, avail_begin, avail_end} ->
+        if ongoing?(avail_end) do
+          {method, host, port, avail_begin, avail_end}
+        else
+          remove_node(eid)
+          :not_found
+        end
+      nil ->
+        :not_found
+    end
+  end
+
+  defp remove_node(eid) do
+    Agent.update(:nodes, &Map.delete(&1, eid))
+    Logger.info("Entry of #{eid} was removed because it is outdated.")
+    :ok
   end
 
   @doc """
@@ -76,15 +99,8 @@ defmodule Bpv7.BPA do
   def schedule_bundle(bundle, eid) do
     {schedule_task, schedule_time} =
     case get_availability(eid) do
-      {avail_begin, avail_end} ->
-        current_time = DateTime.utc_now()
-        schedule_time = DateTime.diff(avail_begin, current_time)
-        schedule_time = cond do
-          schedule_time < 0 ->
-            0
-          true ->
-            schedule_time * 1000
-        end
+      {avail_begin, _avail_end} ->
+        schedule_time = Bpv7.Helpers.get_schedule_time(avail_begin)
         {:send, schedule_time}
       :not_found ->
         Logger.info("No configuration found for #{eid}. Trying again in 5 seconds.")
@@ -95,7 +111,7 @@ defmodule Bpv7.BPA do
   end
 
   @doc """
-  Callback to retrie the Scheduling of the Bundle if there was no suitable configuration at the previous attempt.
+  Callback to retry the Scheduling of the Bundle if there was no suitable configuration at the previous attempt.
   """
   def handle_info({:schedule, bundle, eid}, state) do
     schedule_bundle(bundle, eid)

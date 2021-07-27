@@ -74,7 +74,7 @@ defmodule Bpv7.CLA_tcp do
     {:ok,bundle} = Map.fetch(bundle,:value)
     {:ok, bundle, ""} = CBOR.decode(bundle)
     hex_data = Base.encode16(<<159>> <> Bpv7.Bundle_Manager.bundleblock_binary(bundle) <> <<255>>)
-    Logger.info("Bundle Received: ${hex_data}")
+    Logger.info("Bundle Received: #{hex_data}")
     :ok = Bpv7.Bundle_Manager.forward_bundle(bundle)
   end
 end
