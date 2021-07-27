@@ -1,5 +1,6 @@
 defmodule Bpv7.ConnManager_test do
   use ExUnit.Case
+  doctest Bpv7.ConnManager
 
   setup do
     Application.stop(:bpv7)

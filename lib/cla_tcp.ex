@@ -1,6 +1,16 @@
 defmodule Bpv7.CLA_tcp do
   require Logger
+  @moduledoc """
+  A Convergence Layer Adapter (CLA) for TCP Connections.
+  It accepts all incoming TCP connections on the port which is specified by starting the CLA with the `accept` function.
+  Every well CBOR formatted Bytestring will be forwarded to the Bundle Manager.
+  It is possible to have several open connections which receive packeges in parallel.
+  """
 
+
+  @doc """
+  Starts accepting connections on given `port`
+  """
   def accept(port) do
     # The options below mean:
     #
