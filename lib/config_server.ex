@@ -51,7 +51,13 @@ defmodule Bpv7.Config_server do
     {:ok, data} = :gen_tcp.recv(socket, 0)
     data = String.trim(data, "\r\n")
     data = String.split(data, ",", parts: 5)
-    {:ok, begin_time, 0} = DateTime.from_iso8601(Enum.at(data,3))
+    #{:ok, begin_time, 0} = DateTime.from_iso8601(Enum.at(data,3))
+    #begin_time = DateTime.from_iso8601(Enum.at(data,3))
+    case DateTime.from_iso8601(Enum.at(data,3)) do
+      {:ok, _, _} -> Logger.info("ok")
+      _ -> Logger.info("begin_time incorrect format")
+    end
+    begin_time = DateTime.from_iso8601(Enum.at(data,3))
     {:ok, end_time, 0} = DateTime.from_iso8601(Enum.at(data,4))
     eid = Enum.at(data, 0)
     host = to_charlist(Enum.at(data,1))
