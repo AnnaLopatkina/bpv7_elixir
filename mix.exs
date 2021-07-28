@@ -13,7 +13,7 @@ defmodule Bpv7.MixProject do
       name: "Bpv7 Elixir Implementierung",
     source_url: "https://gitlab.com/unikram/bpv7_elixir",
     docs: [
-    main: "Bpv7 Elixir Implementierung",
+    main: "Bpv7",
     extras: ["README.md"]
     ]
     ]
