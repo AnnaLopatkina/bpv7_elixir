@@ -7,7 +7,15 @@ defmodule Bpv7.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+
+      # Docs
+      name: "Bpv7 Elixir Implementierung",
+    source_url: "https://gitlab.com/unikram/bpv7_elixir",
+    docs: [
+    main: "Bpv7 Elixir Implementierung",
+    extras: ["README.md"]
+    ]
     ]
   end
 
@@ -25,7 +33,8 @@ defmodule Bpv7.MixProject do
       {:cbor, "~> 1.0.0"},
       {:typed_struct, "~> 0.2.1"},
       {:timex, "~> 3.0"},
-      {:crc32cer, "~> 0.1.10"}
+      {:crc32cer, "~> 0.1.10"},
+      {:ex_doc, "~> 0.24", only: :dev, runtime: false}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
