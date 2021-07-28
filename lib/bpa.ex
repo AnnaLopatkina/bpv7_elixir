@@ -53,7 +53,7 @@ defmodule Bpv7.BPA do
 
   @doc """
   Returns a tupel with the Availability of the given `eid`.
-  The first value is the Begin and the second the end of the availablity.
+  The first value is the Begin and the second the end of the availability.
 
   If no suitable configuration is found `:not_found` will be returned.
   """
@@ -96,9 +96,9 @@ defmodule Bpv7.BPA do
 
   @doc """
   Schedules a Bundle for the forwarding to a foreign node.
-  The specific send time is retreived from the configuration.
+  The specific send time is retrieved from the configuration.
 
-  If no configuration is gived the scheduling is retried every 5 seconds.
+  If no configuration is given the scheduling is retried every 5 seconds.
   """
   def schedule_bundle(bundle, eid) do
     {schedule_task, schedule_time} =
@@ -116,7 +116,7 @@ defmodule Bpv7.BPA do
 
   @doc """
   Callback for Events which should happen later.
-  There are different Functions that can be distinguished by the Atom at the begginning of the argument tuple.
+  There are different Functions that can be distinguished by the Atom at the beginning of the argument tuple.
   The available Function will be described below.
 
   `{:schedule, bundle, eid}`
