@@ -156,4 +156,9 @@ defmodule Bpv7.BPA do
     Logger.info("Outgoing connection to peer closed.")
     {:noreply, state}
   end
+
+  def handle_info(:not_found, state) do
+    Logger.info("Peer Node ist not reachable (anymore).")
+    {:noreply, state}
+  end
 end
