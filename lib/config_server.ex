@@ -51,25 +51,30 @@ defmodule Bpv7.Config_server do
     {:ok, data} = :gen_tcp.recv(socket, 0)
     data = String.trim(data, "\r\n")
     data = String.split(data, ",", parts: 5)
-    #{:ok, begin_time, 0} = DateTime.from_iso8601(Enum.at(data,3))
-    #begin_time = DateTime.from_iso8601(Enum.at(data,3))
     case DateTime.from_iso8601(Enum.at(data,3)) do
-      {:ok, _, _} -> Logger.info("ok")
+      :ok, _, _ -> Logger.info("begin_time ok")
+        begin_time = DateTime.from_iso8601(Enum.at(data,3))
+           case  DateTime.from_iso8601(Enum.at(data,4)) do
+                :ok, _, _ -> Logger.info("end_time ok")
+                     end_time = DateTime.from_iso8601(Enum.at(data,4))
+                     eid = Enum.at(data, 0)
+                     host = to_charlist(Enum.at(data,1))
+                     port = String.to_integer(Enum.at(data,2))
+                     add_node = Bpv7.BPA.add_tcp_node(eid, host, port, begin_time, end_time)
+                     case add_node do
+                        :ok -> Logger.info("Connection: #{host} on port #{port},
+                                              eid: #{eid},
+                                              begin time: #{begin_time},
+                                              end time: #{end_time}")
+                         _ -> Logger.info("error")
+                     end
+                _ -> Logger.info("end_time incorrect format")
+           end
       _ -> Logger.info("begin_time incorrect format")
     end
-    begin_time = DateTime.from_iso8601(Enum.at(data,3))
-    {:ok, end_time, 0} = DateTime.from_iso8601(Enum.at(data,4))
-    eid = Enum.at(data, 0)
-    host = to_charlist(Enum.at(data,1))
-    port = String.to_integer(Enum.at(data,2))
-    add_node = Bpv7.BPA.add_tcp_node(eid, host, port, begin_time, end_time)
-    case add_node do
-      :ok -> Logger.info("Connection: #{host} on port #{port},
-                    eid: #{eid},
-                    begin time: #{begin_time},
-                    end time: #{end_time}")
-      _ -> Logger.info("error")
-    end
+
   end
+
+
 
 end
