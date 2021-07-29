@@ -11,7 +11,7 @@ After that the application can be started by
 
 With the default settings the node is now accepting Bundles at port 4040.
 The Port can be changed by the environment variable `PORT`.
-For example `PORT=4050 mix run --no-halt`
+For example `PORT=4040 mix run --no-halt`
 
 To be able to forward Bundle the node need to know how it can reach Nodes for specific EIDs.
 The configuration is done via a simple tcp Session on Port 4041 which can used for example with telnet.
