@@ -49,32 +49,28 @@ defmodule Bpv7.Config_server do
 
   defp read_line(socket) do
     {:ok, data} = :gen_tcp.recv(socket, 0)
-    data = String.trim(data, "\r\n")
-    data = String.split(data, ",", parts: 5)
-    case DateTime.from_iso8601(Enum.at(data,3)) do
-      :ok, _, _ -> Logger.info("begin_time ok")
-        begin_time = DateTime.from_iso8601(Enum.at(data,3))
-           case  DateTime.from_iso8601(Enum.at(data,4)) do
-                :ok, _, _ -> Logger.info("end_time ok")
-                     end_time = DateTime.from_iso8601(Enum.at(data,4))
-                     eid = Enum.at(data, 0)
-                     host = to_charlist(Enum.at(data,1))
-                     port = String.to_integer(Enum.at(data,2))
-                     add_node = Bpv7.BPA.add_tcp_node(eid, host, port, begin_time, end_time)
-                     case add_node do
-                        :ok -> Logger.info("Connection: #{host} on port #{port},
-                                              eid: #{eid},
-                                              begin time: #{begin_time},
-                                              end time: #{end_time}")
-                         _ -> Logger.info("error")
-                     end
-                _ -> Logger.info("end_time incorrect format")
-           end
-      _ -> Logger.info("begin_time incorrect format")
+    try do
+      data = String.trim(data, "\r\n")
+      data = String.split(data, ",", parts: 5)
+      eid = Enum.at(data, 0)
+      host = to_charlist(Enum.at(data,1))
+      port = String.to_integer(Enum.at(data,2))
+      with {:ok, begin_time, 0} <- DateTime.from_iso8601(Enum.at(data,3)),
+           {:ok, end_time, 0} <- DateTime.from_iso8601(Enum.at(data,4))
+      do
+        Bpv7.BPA.add_tcp_node(eid, host, port, begin_time, end_time)
+        Logger.info("Connection: #{host} on port #{port},
+                       eid: #{eid},
+                       begin time: #{begin_time},
+                       end time: #{end_time}")
+      else
+        {:error, :invalid_format} -> Logger.info("Parsing Datetime failed because of invalid format")
+        {:error, :missing_offset} -> Logger.info("Parsing Datetime failes because of invalid offset")
+        {:error, :invalid_time}   -> Logger.info("Parsing Datetime failed because of invalid Time")
+        {:error, :invalid_date}   -> Logger.info("Parsing Datetime failed because of invalid Date")
+      end
+    rescue
+      ArgumentError -> Logger.info("Invalid Config String")
     end
-
   end
-
-
-
 end
