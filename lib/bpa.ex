@@ -145,20 +145,19 @@ defmodule Bpv7.BPA do
   end
 
   def handle_info({:connect_tcp, eid}, state) do
-    {:tcp, host, port, _, _} = get_node(eid)
-    unless Bpv7.ConnManager.check_connection?(host, port) do
-      Bpv7.ConnManager.connect(host, port)
+    with {:tcp, host, port, _, _} <- get_node(eid)
+    do
+      unless Bpv7.ConnManager.check_connection?(host, port) do
+        Bpv7.ConnManager.connect(host, port)
+      end
+    else
+      :not_found -> Logger.info("Node was alreade removed.")
     end
     {:noreply, state}
   end
 
   def handle_info({:tcp_closed, _}, state) do
     Logger.info("Outgoing connection to peer closed.")
-    {:noreply, state}
-  end
-
-  def handle_info(:not_found, state) do
-    Logger.info("Peer Node ist not reachable (anymore).")
     {:noreply, state}
   end
 end
