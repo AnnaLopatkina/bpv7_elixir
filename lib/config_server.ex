@@ -18,13 +18,7 @@ defmodule Bpv7.Config_server do
     loop_acceptor(socket)
   end
 
-  @doc """
-  Waits for a client connection on that port and accepts it
-
-  ## Parameters
-
-  - socket:
-  """
+  # Waits for a client connection on that port and accepts it
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
     {:ok, pid} = Task.Supervisor.start_child(Bpv7.CLA_tcp.TaskSupervisor, fn -> serve(client) end)
@@ -33,13 +27,7 @@ defmodule Bpv7.Config_server do
     loop_acceptor(socket)
   end
 
-  @doc """
-  Reads the client request
-
-  ## Parameters
-
-  - socket:
-  """
+  # Reads the client request
   defp serve(socket) do
     read_line(socket)
 
