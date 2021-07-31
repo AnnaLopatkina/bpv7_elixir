@@ -1,21 +1,7 @@
 defmodule Bpv7 do
   use Timex
   @moduledoc """
-  Documentation for `Bpv7`.
+  Documentation for the `Bpv7 implementation in Elixir`.
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Bpv7.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
-
 end
 
