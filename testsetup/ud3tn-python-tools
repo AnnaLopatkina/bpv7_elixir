@@ -1,6 +1,0 @@
-FROM python:3.8
-RUN pip install --no-cache-dir ud3tn-utils 
-RUN wget https://gitlab.com/d3tn/ud3tn/-/raw/master/tools/aap/aap_config.py \
-    && wget https://gitlab.com/d3tn/ud3tn/-/raw/master/tools/aap/aap_receive.py \
-    && wget https://gitlab.com/d3tn/ud3tn/-/raw/master/tools/aap/aap_send.py \
-    && wget https://gitlab.com/d3tn/ud3tn/-/raw/master/tools/aap/helpers.py
